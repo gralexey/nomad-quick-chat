@@ -1,4 +1,4 @@
-# LXMF Quick Chat
+# Nomad Quick Chat
 
 A lightweight chat script for NomadNet nodes.
 
