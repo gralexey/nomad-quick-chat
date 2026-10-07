@@ -5,6 +5,7 @@ import os
 import secrets
 from datetime import datetime
 from utils import sanitize, format_message_time, find_name, initialize_db_if_needed, get_messages, insert_message, check_if_message_exists, identified_name_markup
+from pagination import requested_page, pagination_line
 from customizations import chat_name as custom_chat_name, footer as footer
 import RNS
 
@@ -67,7 +68,12 @@ if message_payload:
           new_message_id = nonce
           insert_message(new_message_id, message_payload, name_to_save, id_hash, inserting_message_ts)
 
-message_count, message_records = get_messages(page_size, 0)
+page = requested_page()
+message_count, message_records = get_messages(page_size, (page - 1) * page_size)
+total_pages = (message_count + page_size - 1) // page_size if message_count else 1
+if page > total_pages:
+  page = total_pages
+  message_count, message_records = get_messages(page_size, (page - 1) * page_size)
 
 if username:
   initial_name = username
@@ -93,6 +99,12 @@ else:
         print(f'`F8ff`!\\[{sent_at}] `Ffff{display_name}: ``{text}')
 
 print("``")
-  
+
+pager = pagination_line(page, total_pages)
+if pager:
+  print("")
+  print(pager)
+  print("`a`b`f")
+
 print(footer())
 
